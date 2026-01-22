@@ -1,0 +1,260 @@
+/* ベーススタイル */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ヘッダー */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    color: #1a73e8;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* 認証セクション */
+.auth-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.auth-section h2 {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.account-email {
+    flex: 1;
+    font-size: 0.9rem;
+    min-width: 200px;
+}
+
+.status {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.status.authenticated {
+    background: #e6f4ea;
+    color: #137333;
+}
+
+.status.not-authenticated {
+    background: #fce8e6;
+    color: #c5221f;
+}
+
+/* ボタン */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.btn-small {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+}
+
+.btn-primary {
+    background: #1a73e8;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1557b0;
+}
+
+.btn-secondary {
+    background: #e8eaed;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #d2d5d9;
+}
+
+/* チャットセクション */
+.chat-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chat-section h2 {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #fafafa;
+}
+
+.message {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    max-width: 85%;
+}
+
+.message.system {
+    background: #e8f0fe;
+    color: #1a73e8;
+}
+
+.message.user {
+    background: #1a73e8;
+    color: white;
+    margin-left: auto;
+}
+
+.message.result {
+    background: #e6f4ea;
+    color: #137333;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+.message.error {
+    background: #fce8e6;
+    color: #c5221f;
+}
+
+.message.loading {
+    background: #fff8e1;
+    color: #f9a825;
+}
+
+/* チャットフォーム */
+.chat-form {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-form input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.chat-form input:focus {
+    border-color: #1a73e8;
+}
+
+/* ヘルプセクション */
+.help-section {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.help-section h3 {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.help-section ul {
+    list-style: none;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.help-section li {
+    padding: 5px 0;
+}
+
+.help-section strong {
+    color: #333;
+}
+
+/* レスポンシブ */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 1.4rem;
+    }
+
+    .account-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .chat-messages {
+        height: 300px;
+    }
+
+    .chat-form {
+        flex-direction: column;
+    }
+
+    .chat-form button {
+        width: 100%;
+    }
+}

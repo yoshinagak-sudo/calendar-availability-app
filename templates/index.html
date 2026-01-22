@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カレンダー空き時間検索</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>カレンダー空き時間検索</h1>
+            <p class="subtitle">2つのGoogleカレンダーの空き時間を検索します</p>
+        </header>
+
+        <!-- 認証状態表示 -->
+        <div id="auth-status" class="auth-section">
+            <h2>認証状態</h2>
+            <div class="account-list">
+                {% for account_id, status in auth_status.items() %}
+                <div class="account-item">
+                    <span class="account-email">{{ status.email }}</span>
+                    {% if status.authenticated %}
+                    <span class="status authenticated">認証済み</span>
+                    <a href="/logout/{{ account_id }}" class="btn btn-small btn-secondary">ログアウト</a>
+                    {% else %}
+                    <span class="status not-authenticated">未認証</span>
+                    <a href="/auth/{{ account_id }}" class="btn btn-small btn-primary">認証する</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- チャットUI -->
+        <div id="chat-section" class="chat-section">
+            <h2>空き時間を検索</h2>
+            <div id="chat-messages" class="chat-messages">
+                <div class="message system">
+                    空き時間を検索したい期間を入力してください。<br>
+                    例: 「今週の候補日」「来週の午後」「1月25日」「30分枠で5件」
+                </div>
+            </div>
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" placeholder="例: 今週の候補日を出して" autocomplete="off">
+                <button type="submit" class="btn btn-primary">検索</button>
+            </form>
+        </div>
+
+        <!-- 使い方 -->
+        <div class="help-section">
+            <h3>使い方</h3>
+            <ul>
+                <li><strong>期間指定:</strong> 「今週」「来週」「今日」「明日」「1月25日」</li>
+                <li><strong>時間帯:</strong> 「午前」「午後」「14時以降」「17時まで」</li>
+                <li><strong>時間枠:</strong> 「30分」「2時間枠」</li>
+                <li><strong>候補数:</strong> 「10件」「3つ」</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+
+        // 認証状態をチェック
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/auth/status');
+                const data = await response.json();
+                return data.all_authenticated;
+            } catch (error) {
+                console.error('認証状態の確認に失敗:', error);
+                return false;
+            }
+        }
+
+        // メッセージを追加
+        function addMessage(content, type = 'system') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = content.replace(/\n/g, '<br>');
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 検索実行
+        async function search(query) {
+            // ユーザーメッセージを表示
+            addMessage(query, 'user');
+
+            // ローディング表示
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message system loading';
+            loadingDiv.textContent = '検索中...';
+            chatMessages.appendChild(loadingDiv);
+
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+
+                // ローディングを削除
+                loadingDiv.remove();
+
+                if (data.error) {
+                    if (data.need_auth) {
+                        addMessage('認証が必要です。上部のボタンから認証してください。', 'error');
+                    } else {
+                        addMessage(`エラー: ${data.error}`, 'error');
+                    }
+                } else {
+                    addMessage(data.result, 'result');
+                }
+            } catch (error) {
+                loadingDiv.remove();
+                addMessage(`通信エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // フォーム送信
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = chatInput.value.trim();
+            if (!query) return;
+
+            // 認証チェック
+            const isAuthenticated = await checkAuthStatus();
+            if (!isAuthenticated) {
+                addMessage('すべてのアカウントで認証が必要です。上部のボタンから認証してください。', 'error');
+                return;
+            }
+
+            chatInput.value = '';
+            await search(query);
+        });
+
+        // 初期フォーカス
+        chatInput.focus();
+    </script>
+</body>
+</html>

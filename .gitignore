@@ -1,0 +1,24 @@
+# 認証情報
+credentials/
+*.json
+
+# Pythonキャッシュ
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 仮想環境
+venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
