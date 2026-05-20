@@ -1,125 +1,35 @@
-# Googleカレンダー空き時間検索アプリ
+# Calendar Availability Finder
 
-2つのGoogleアカウントのカレンダーを参照し、両方で空いている時間帯を候補として出力するWebアプリです。
+Find time slots that are free across multiple Google Calendar accounts in a single view.
 
-## 対象アカウント
-- keiggoo.0527@gmail.com
-- yoshinaga_k@butaifarm.com
+## Why it exists
 
-## セットアップ
+Scheduling across two or more Google accounts (e.g. a personal calendar and a company calendar) is a constant friction. Google Calendar's UI only shows your own free time clearly; overlapping availability across accounts is hidden behind manual checking. This tool reads both calendars via the Google Calendar API and outputs the intersection of free slots.
 
-### 1. 依存パッケージのインストール
+## What it does
+
+- Reads multiple Google Calendar accounts via OAuth
+- Computes the intersection of busy/free across all configured calendars
+- Outputs candidate free slots within a given date range and working-hour window
+- Useful for sharing availability with someone who needs a single combined view
+
+## Stack
+
+- Python
+- Google Calendar API (OAuth 2.0)
+
+## Setup
 
 ```bash
-cd ~/calendar-app
 pip install -r requirements.txt
 ```
 
-### 2. Google Cloud Consoleでの設定
-
-#### 手順1: プロジェクト作成
-1. https://console.cloud.google.com/ にアクセス
-2. 上部の「プロジェクトを選択」→「新しいプロジェクト」
-3. プロジェクト名を入力（例: calendar-availability-app）→「作成」
-
-#### 手順2: Calendar API有効化
-1. 左メニュー「APIとサービス」→「ライブラリ」
-2. 「Google Calendar API」を検索してクリック
-3. 「有効にする」をクリック
-
-#### 手順3: OAuth同意画面設定
-1. 左メニュー「APIとサービス」→「OAuth同意画面」
-2. 「外部」を選択→「作成」
-3. アプリ名、ユーザーサポートメール、デベロッパー連絡先を入力
-4. 「保存して次へ」→スコープは後で追加
-5. テストユーザーに2つのメールアドレスを追加:
-   - keiggoo.0527@gmail.com
-   - yoshinaga_k@butaifarm.com
-
-#### 手順4: OAuth 2.0クライアントID作成
-1. 左メニュー「APIとサービス」→「認証情報」
-2. 「認証情報を作成」→「OAuthクライアントID」
-3. アプリケーションの種類: 「ウェブアプリケーション」
-4. 名前を入力
-5. 「承認済みのリダイレクトURI」に追加:
-   - `http://localhost:5000/oauth2callback`
-6. 「作成」→JSONをダウンロード
-7. ダウンロードしたファイルを `credentials/credentials.json` として保存
-
-### 3. アプリの起動
+Follow the Google Cloud Console steps in `docs/setup.md` to create OAuth credentials, then place `credentials.json` in the project root and run:
 
 ```bash
-python app.py
+python find_availability.py --start 2026-05-21 --end 2026-05-31 --hours 09:00-18:00
 ```
 
-ブラウザで http://localhost:5000 にアクセスします。
+---
 
-### 4. 認証
-
-1. 各アカウントの「認証する」ボタンをクリック
-2. Googleアカウントでログイン
-3. カレンダーへのアクセスを許可
-
-## 使い方
-
-検索ボックスに自然言語で期間を入力します。
-
-### 入力例
-
-| 入力 | 説明 |
-|------|------|
-| 今週の候補日 | 今週の空き時間を検索 |
-| 来週の午後 | 来週の午後（13:00-18:00）を検索 |
-| 1月25日 | 特定の日付を検索 |
-| 30分枠で10件 | 30分単位で10件の候補を表示 |
-| 来週 14時以降 2時間枠 | 来週の14時以降、2時間枠で検索 |
-
-### 解析可能なキーワード
-
-- **期間**: 今週、来週、今日、明日、〇月〇日、〇日
-- **時間帯**: 午前、午後、〇時以降、〇時から、〇時まで
-- **時間枠**: 〇分、〇時間、〇分枠
-- **候補数**: 〇件、〇個、〇つ
-
-## 出力例
-
-```
-候補日
-・1/21（火） 10:00–11:00
-・1/21（火） 14:00–15:00
-・1/22（水） 9:00–10:00
-・1/22（水） 15:00–16:00
-・1/23（木） 11:00–12:00
-```
-
-## デフォルト設定
-
-- 営業時間: 9:00 - 18:00
-- 予定終了後のバッファ: 30分
-- 時間枠: 1時間
-- 最大候補数: 5件
-- 週末: 除外
-
-## ファイル構成
-
-```
-~/calendar-app/
-├── app.py                 # Flaskメインアプリ
-├── calendar_service.py    # Google Calendar API連携
-├── availability.py        # 空き時間計算ロジック
-├── templates/
-│   └── index.html         # フロントエンドUI
-├── static/
-│   └── style.css          # スタイル
-├── credentials/           # OAuth認証情報
-│   ├── credentials.json   # Google Cloud OAuth クライアント
-│   └── token_*.json       # 各アカウントのトークン
-├── requirements.txt
-└── README.md
-```
-
-## 注意事項
-
-- `credentials/` ディレクトリはGitにコミットしないでください
-- テストユーザーとして登録されたアカウントのみ認証可能です
-- 本番環境で使用する場合は、OAuth同意画面を「公開」にする必要があります
+Built by [Keigo Yoshinaga](https://github.com/yoshinagak-sudo).
